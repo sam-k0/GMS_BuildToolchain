@@ -22,6 +22,7 @@ void compile()
 
 int main()
 {
+	cout << "[?] Please input the game's executable file name (ex: my_game.exe)" << endl;
 	string compiledProgramName;
 	cin >> compiledProgramName;
 
@@ -43,13 +44,28 @@ int main()
 		Sleep(300);
 		clear();
 		pI_waitfor = getProgamProcInfo(compiledProgramName.c_str());
-		cout << "Waiting for Process to start..." << endl;
+		cout << "[...] Waiting for compilation to finish and game to start..." << endl;
 	}
 	// Process is found
 	clear();
-	cout << "Found autostarted game" << endl;
+	cout << "[!] Found autostarted game. " << endl;
 
+// Kill the autostarted game
+	cout << "[!] Obtaining process handle with [PROCESS_ALL_ACCESS] rights. " << endl;
+	HANDLE apProcHandle = OpenProcess(PROCESS_ALL_ACCESS, TRUE, pI_waitfor->pid);
+	if (apProcHandle)
+	{
+		cout << "[!] Terminating autostarted game. " << endl;
+		TerminateProcess(apProcHandle, 0);
+	}
+	else
+	{
+		cout << "[!] Could not terminate game: Process handle rejected. "<<endl << "[i] Try restarting this program with Admin rights." << endl;
+		return -1;
+	}
+	
 
+	delete pI_waitfor;
 
 // Inject the debugging DLL (Maybe even load with DLL)
 	
