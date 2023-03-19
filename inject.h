@@ -1,5 +1,6 @@
 #pragma once
-#include "headerincludes.h"
+#include "helper.h"
+#include "detours.h"
 using namespace std;
 // Get ID from Window
 void getProcessId(const char* window_title, DWORD& process_id)
@@ -51,4 +52,39 @@ bool InjectDLL(const int& pid, const string& DLL_Path)
     }
 
     return false;
+}
+
+// MS Detours DLL loading
+INT StartProcessWithDLL(string directoryOfDll, string DllName, string appStartPath)
+{
+    std::string _Dll = directoryOfDll + "\\" + DllName;
+
+    if (GetFileAttributesA(_Dll.c_str()) == INVALID_FILE_ATTRIBUTES)//Does dll Exist
+    {
+        cout << "[!] Dll file " << _Dll << " does not exist. " << endl;
+        return EXIT_FAILURE;
+    }
+        
+
+    STARTUPINFOA _StartupInfo;
+
+    ZeroMemory(&_StartupInfo, sizeof(STARTUPINFOA));
+    _StartupInfo.cb = sizeof(STARTUPINFOA);
+
+    PROCESS_INFORMATION _Information;
+    ZeroMemory(&_Information, sizeof(PROCESS_INFORMATION));
+
+    //THIS ONE FOR WIN 32 BIT
+    if (DetourCreateProcessWithDllA(appStartPath.c_str(), NULL, NULL, NULL, TRUE, CREATE_DEFAULT_ERROR_MODE, NULL, directoryOfDll.c_str(), &_StartupInfo, &_Information, _Dll.c_str(), NULL))
+    {
+        //MessageBoxA(NULL, "INJECTED", NULL, NULL);
+        cout << "[OK] Created Process with loaded DLL." << endl;
+    }
+    else
+    {
+        cout << "[!] Could not Inject: Maybe the DLL path, Exe path is wrong?" << endl;
+    }
+
+    return EXIT_SUCCESS;
+    
 }

@@ -1,5 +1,16 @@
 #pragma once
-#include "headerincludes.h"
+#pragma warning(disable : 4996)
+#include <iostream>
+#include <windows.h>
+#include <string>
+#include <thread>
+#include <libloaderapi.h>
+#include <stdio.h>
+#include <direct.h>
+#include <processthreadsapi.h>
+#include <vector>
+#include <iterator>
+#include <sstream>
 using namespace std;
 
 
@@ -23,6 +34,17 @@ bool fileExists(string fileName)
     return (stat(fileName.c_str(), &buffer) == 0);
 }
 
+//https://www.geeksforgeeks.org/how-to-check-a-file-or-directory-exists-in-cpp/
+bool isDirectory(const char* dir)
+{
+    struct stat sb;
+
+    if (stat(dir, &sb) == 0)
+        return true;
+    else
+        return false;
+}
+
 
 //https://stackoverflow.com/questions/6486289/how-can-i-clear-console
 // Clears the console window without using system() commands
@@ -41,4 +63,29 @@ void clear() {
         screen.dwSize.X * screen.dwSize.Y, topLeft, &written
     );
     SetConsoleCursorPosition(console, topLeft);
+}
+
+std::string getCurrentDir() // Returns EXE directory
+{
+    char cCurrentPath[FILENAME_MAX]; // get working directory into buffer
+    if (!getcwd(cCurrentPath, sizeof(cCurrentPath)))
+        exit(-1);
+    cCurrentPath[sizeof(cCurrentPath) - 1] = '\0'; // not really required
+
+    char* s = cCurrentPath; // save path from buffer into currentpath chararr
+    std::string str(s);
+    free(s);
+    return str;
+}
+
+string Join(vector<string> strings)
+{
+    const char* const delim = " ";
+    std::ostringstream imploded;
+    string ret;
+    std::copy(strings.begin(), strings.end(), std::ostream_iterator<std::string>(imploded, delim));
+    ret = imploded.str();
+    ret.pop_back();
+
+    return ret;
 }

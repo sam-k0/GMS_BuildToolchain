@@ -1,8 +1,7 @@
 #include "inject.h"
 #include "ExternalCompiler/ProcEnum.h"
 #include "ExternalCompiler/WindowHook.h"
-#include "helper.h"
-#include "detours.h"
+
 
 processInfo* IDE = NULL;
 
@@ -21,10 +20,30 @@ void compile()
 
 }
 
-int main()
+int main(int argc, char* argv[])
 {
+	string compiledProgramName = "CEDummyStdout.exe";
+	string directoryOfDLL = "E:\\VisualStudio\\projects\\DLL_redirConsole\\Release";
+	string dllFileName = "DLL_redirConsole.dll";
+	string compiledProgramFullPath = "E:\\Modding\\03_dummy\\CheatEngineDummy-Default-1.0.0.1\\CheatEngineDummy.exe";
+
+	string CompleteP = directoryOfDLL + "\\" + dllFileName;
+	StartProcessWithDLL(directoryOfDLL, dllFileName, compiledProgramFullPath);
+	
+	return 0;
+
+	std::vector<std::string> all_args; // Store the arguments as a vector of strings
+	string thisExePath = string(argv[0]); // get the current path to this file (including X.exe)
+	if (argc > 1) {
+		all_args.assign(argv + 1, argv + argc);
+	}
+	else
+	{
+		cout << "[i] No startup parameters provided." << endl;
+	}
+
 	cout << "[?] Please input the game's executable file name (ex: my_game.exe)" << endl;
-	string compiledProgramName;
+	
 	cin >> compiledProgramName;
 
 
@@ -69,5 +88,5 @@ int main()
 	delete pI_waitfor;
 
 // Inject the debugging DLL (Maybe even load with DLL)
-	
+	//StartProcessWithDLL()
 }
