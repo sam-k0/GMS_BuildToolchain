@@ -22,15 +22,12 @@ void compile()
 
 int main(int argc, char* argv[])
 {
-	string compiledProgramName = "CEDummyStdout.exe";
+	string compiledProgramName = "CheatEngineDummy.exe";
 	string directoryOfDLL = "E:\\VisualStudio\\projects\\DLL_redirConsole\\Release";
 	string dllFileName = "DLL_redirConsole.dll";
-	string compiledProgramFullPath = "E:\\Modding\\03_dummy\\CheatEngineDummy-Default-1.0.0.1\\CheatEngineDummy.exe";
+	//string compiledProgramFullPath = ""; 
+	// later we dont need compiledprogfullp cause we get it as a struct when we kill the process that got autostarted
 
-	string CompleteP = directoryOfDLL + "\\" + dllFileName;
-	StartProcessWithDLL(directoryOfDLL, dllFileName, compiledProgramFullPath);
-	
-	return 0;
 
 	std::vector<std::string> all_args; // Store the arguments as a vector of strings
 	string thisExePath = string(argv[0]); // get the current path to this file (including X.exe)
@@ -43,36 +40,36 @@ int main(int argc, char* argv[])
 	}
 
 	cout << "[?] Please input the game's executable file name (ex: my_game.exe)" << endl;
-	
-	cin >> compiledProgramName;
+
+	//cin >> compiledProgramName;
 
 
 /// Get a hook to the GMS window
 	IDE = getProgamProcInfo(IDEname);
-// Check if struct is valid
+	// Check if struct is valid
 	bool valid = is_valid(IDE);
 	std::cout << (valid == true ? "[OK] Struct seems valid." : "[!] Struct is invalid.") << std::endl;
-// Trigger compilation
+	// Trigger compilation
 	if (valid) {
 		std::cout << (sendCompileSignal(IDE) == true ? "[OK] Success on sending signal." : "[!] Could not send signal.") << std::endl;
 	}
-// Run the generated executable
-	processInfo* pI_waitfor = nullptr;
-	while (pI_waitfor == nullptr)
+	// Run the generated executable
+	processInfo* procInfo_autoStart = nullptr;
+	while (procInfo_autoStart == nullptr)
 	{
-		
+
 		Sleep(300);
 		clear();
-		pI_waitfor = getProgamProcInfo(compiledProgramName.c_str());
+		procInfo_autoStart = getProgamProcInfo(compiledProgramName.c_str());
 		cout << "[...] Waiting for compilation to finish and game to start..." << endl;
 	}
 	// Process is found
 	clear();
 	cout << "[!] Found autostarted game. " << endl;
 
-// Kill the autostarted game
+	// Kill the autostarted game
 	cout << "[!] Obtaining process handle with [PROCESS_ALL_ACCESS] rights. " << endl;
-	HANDLE apProcHandle = OpenProcess(PROCESS_ALL_ACCESS, TRUE, pI_waitfor->pid);
+	HANDLE apProcHandle = OpenProcess(PROCESS_ALL_ACCESS, TRUE, procInfo_autoStart->pid);
 	if (apProcHandle)
 	{
 		cout << "[!] Terminating autostarted game. " << endl;
@@ -80,13 +77,16 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		cout << "[!] Could not terminate game: Process handle rejected. "<<endl << "[i] Try restarting this program with Admin rights." << endl;
+		cout << "[!] Could not terminate game: Process handle rejected. " << endl << "[i] Try restarting this program with Admin rights." << endl;
 		return -1;
 	}
-	
+	CloseHandle(apProcHandle);
 
-	delete pI_waitfor;
+	// Start the process manually with dll onload
+	DWORD manualProcID = StartProcessWithDLL(directoryOfDLL, dllFileName, procInfo_autoStart->completeExePath);
 
-// Inject the debugging DLL (Maybe even load with DLL)
-	//StartProcessWithDLL()
+	delete procInfo_autoStart; // delete as it is no longer used and up to date (the process is dead)
+	std::cout << (manualProcID != NULL ? "[OK] Started executable with DLL attached." : "[!] Could not start and attach DLL.") << std::endl;
+
+	// Maybe "wait for running game to finish?"
 }

@@ -55,14 +55,14 @@ bool InjectDLL(const int& pid, const string& DLL_Path)
 }
 
 // MS Detours DLL loading
-INT StartProcessWithDLL(string directoryOfDll, string DllName, string appStartPath)
+DWORD StartProcessWithDLL(string directoryOfDll, string DllName, string appStartPath)
 {
     std::string _Dll = directoryOfDll + "\\" + DllName;
 
     if (GetFileAttributesA(_Dll.c_str()) == INVALID_FILE_ATTRIBUTES)//Does dll Exist
     {
         cout << "[!] Dll file " << _Dll << " does not exist. " << endl;
-        return EXIT_FAILURE;
+        return NULL;
     }
         
 
@@ -83,8 +83,9 @@ INT StartProcessWithDLL(string directoryOfDll, string DllName, string appStartPa
     else
     {
         cout << "[!] Could not Inject: Maybe the DLL path, Exe path is wrong?" << endl;
+        return NULL;
     }
 
-    return EXIT_SUCCESS;
+    return _Information.dwProcessId;
     
 }

@@ -1,9 +1,11 @@
 #pragma once
 #include <Windows.h>
+#include <string>
 
 struct processInfo {
 	DWORD pid;
 	HWND hwnd;
+	std::string completeExePath;
 };
 
 typedef struct taskMgrProcInfo {

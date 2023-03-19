@@ -10,6 +10,7 @@ processInfo* getProgamProcInfo(const char* searchedProcName)
 	processInfo* pi = new processInfo();
 	pi->pid = NULL;
 	pi->hwnd = NULL;
+	pi->completeExePath = "";
 
 	HANDLE hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPALL, NULL);
 	PROCESSENTRY32 pEntry;
@@ -25,6 +26,17 @@ processInfo* getProgamProcInfo(const char* searchedProcName)
 		{
 			// Begin to fill struct
 			pi->pid = (DWORD)pEntry.th32ProcessID;
+			// Also get the full filepath
+			TCHAR filename[MAX_PATH];
+			HANDLE procHnd = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, (DWORD)pEntry.th32ProcessID);
+			if (procHnd)
+			{
+				if (GetModuleFileNameEx(procHnd, NULL, filename, MAX_PATH) != 0)
+				{	
+					pi->completeExePath = (std::string)filename;
+				}
+			}
+				
 			foundProc = true;
 		}
 		hRes = Process32Next(hSnapShot, &pEntry);
