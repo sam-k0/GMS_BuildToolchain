@@ -2,6 +2,7 @@
 #include "ExternalCompiler/ProcEnum.h"
 #include "ExternalCompiler/WindowHook.h"
 #include "helper.h"
+#include "detours.h"
 
 processInfo* IDE = NULL;
 
