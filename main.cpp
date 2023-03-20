@@ -41,15 +41,18 @@ int main(int argc, char* argv[])
 	// Check if it was passed as an argument (1)
 	if (all_args.size() != 0)
 	{
-		if (fileExists(all_args.at(0)))
-		{
-			cout << "[i] Reading file from: " << all_args.at(0) << endl;
-			RunnerConfig = readConfigFromDebugFile(all_args.at(0));
-			if (!isValidConfig(RunnerConfig))
+		if(endsWith(all_args.at(0), "runnerconfig"))
+		{ 
+			if (fileExists(all_args.at(0)))
 			{
-				cerr << "[!] There's an error in the configuration file. Please regenerate the configuration file and restart the program" << endl;
-				getchar();
-				exit(-1);
+				cout << "[i] Reading file from: " << all_args.at(0) << endl;
+				RunnerConfig = readConfigFromDebugFile(all_args.at(0));
+				if (!isValidConfig(RunnerConfig))
+				{
+					cerr << "[!] There's an error in the configuration file. Please regenerate the configuration file and restart the program" << endl;
+					getchar();
+					exit(-1);
+				}
 			}
 		}
 	}
