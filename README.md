@@ -14,6 +14,7 @@ There are 2 ways:
 
 ## Runnerconfig files
 These files contain the name of the compiled executable, the debug DLL directory and filename.<br>
+Create a new file and call it `runnerconfig`<br>
 Structure is like this:
 ```json
 {
@@ -23,6 +24,6 @@ Structure is like this:
 }
 ```
 It makes sense to have one file per project, in your GM-Project directory.<br>
-To use it, drag and drop the `runnerfile` onto the executable.
+To use it, drag and drop the `runnerconfig` onto the executable.
 <br>
 You should see GameMaker Studio compiling and running the game.
