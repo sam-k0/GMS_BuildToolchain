@@ -1,6 +1,10 @@
 #pragma once
 #include "helper.h"
 #include "detours.h"
+#include "ExternalCompiler/structDefs.h"
+
+
+
 using namespace std;
 // Get ID from Window
 void getProcessId(const char* window_title, DWORD& process_id)
@@ -55,14 +59,14 @@ bool InjectDLL(const int& pid, const string& DLL_Path)
 }
 
 // MS Detours DLL loading
-DWORD StartProcessWithDLL(string directoryOfDll, string DllName, string appStartPath)
+StartProcessData StartProcessWithDLL(string directoryOfDll, string DllName, string appStartPath)
 {
     std::string _Dll = directoryOfDll + "\\" + DllName;
 
     if (GetFileAttributesA(_Dll.c_str()) == INVALID_FILE_ATTRIBUTES)//Does dll Exist
     {
         cout << "[!] Dll file " << _Dll << " does not exist. " << endl;
-        return NULL;
+        return StartProcessData(NULL, NULL);
     }
         
 
@@ -83,9 +87,8 @@ DWORD StartProcessWithDLL(string directoryOfDll, string DllName, string appStart
     else
     {
         cout << "[!] Could not Inject: Maybe the DLL path, Exe path is wrong?" << endl;
-        return NULL;
+        return StartProcessData(NULL, NULL);
     }
 
-    return _Information.dwProcessId;
-    
+    return StartProcessData(_Information.dwProcessId, _Information.hProcess);    
 }

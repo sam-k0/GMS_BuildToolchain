@@ -22,3 +22,13 @@ typedef struct taskMgrProcInfo {
 	}
 
 } taskMgrProcInfo;
+
+typedef struct StartProcessData {
+	DWORD pid = NULL;
+	HANDLE hProc = NULL;
+
+	StartProcessData(DWORD _p, HANDLE _hp) {
+		pid = _p;
+		hProc = _hp;
+	}
+} StartProcessData;
