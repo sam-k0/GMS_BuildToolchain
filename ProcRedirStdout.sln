@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.32228.343
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ProcRedirStdout", "ProcRedirStdout.vcxproj", "{4DD7E856-8190-4D36-8F47-1BBAAFCC2F91}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DLL_redirConsole", "..\DLL_redirConsole\DLL_redirConsole.vcxproj", "{F7303ABD-A505-4A41-9B45-2B00EC589027}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DLL_redirConsole", "DebugRunnerDLL\DLL_redirConsole.vcxproj", "{F7303ABD-A505-4A41-9B45-2B00EC589027}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

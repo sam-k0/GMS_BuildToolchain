@@ -60,6 +60,10 @@ processInfo* getProgamProcInfo(const char* searchedProcName)
 bool is_valid(processInfo* pi)
 {
 	// WOOHOO here we goo boolean operators
+	if(!pi)
+	{
+		return false;
+	}
 	bool res;
 	return res = (pi->hwnd != NULL) && (pi->pid != NULL) ? true : false; //((pi->hwnd != NULL) && (pi->pid != NULL));
 }

@@ -50,5 +50,8 @@
     <ClInclude Include="ExternalCompiler\WindowHook.h">
       <Filter>Header Files\ExtComp</Filter>
     </ClInclude>
+    <ClInclude Include="ConfigReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

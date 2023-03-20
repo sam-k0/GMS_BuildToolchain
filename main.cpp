@@ -1,7 +1,7 @@
 #include "inject.h"
 #include "ExternalCompiler/ProcEnum.h"
 #include "ExternalCompiler/WindowHook.h"
-
+#include "ConfigReader.h"
 
 processInfo* IDE = NULL;
 
@@ -25,9 +25,7 @@ int main(int argc, char* argv[])
 	string compiledProgramName = "CheatEngineDummy.exe";
 	string directoryOfDLL = "E:\\VisualStudio\\projects\\DLL_redirConsole\\Release";
 	string dllFileName = "DLL_redirConsole.dll";
-	//string compiledProgramFullPath = ""; 
-	// later we dont need compiledprogfullp cause we get it as a struct when we kill the process that got autostarted
-
+	YYRunnerConfig RunnerConfig;
 
 	std::vector<std::string> all_args; // Store the arguments as a vector of strings
 	string thisExePath = string(argv[0]); // get the current path to this file (including X.exe)
@@ -39,9 +37,37 @@ int main(int argc, char* argv[])
 		cout << "[i] No startup parameters provided." << endl;
 	}
 
-	cout << "[?] Please input the game's executable file name (ex: my_game.exe)" << endl;
+/// Read the configfile
+	// Check if it was passed as an argument (1)
+	if (all_args.size() != 0)
+	{
+		if (fileExists(all_args.at(0)))
+		{
+			cout << "[i] Reading file from: " << all_args.at(0) << endl;
+			RunnerConfig = readConfigFromDebugFile(all_args.at(0));
+			if (!isValidConfig(RunnerConfig))
+			{
+				cerr << "[!] There's an error in the configuration file. Please regenerate the configuration file and restart the program" << endl;
+				getchar();
+				exit(-1);
+			}
+		}
+	}
+	else {
+		cout << "[?] Please input the game's executable file name (ex: my_game.exe)" << endl;
+		cin >> compiledProgramName;
+		cout << "[!] WARNING: This method of using the toolchain requires the DebugDLL to be in the same directory as this launcher." << endl;
+		directoryOfDLL = getCurrentDir();
 
-	//cin >> compiledProgramName;
+		cout << directoryOfDLL + "\\" + dllFileName << endl;
+
+		if (!fileExists(directoryOfDLL + "\\" + dllFileName))
+		{
+			cerr << "[!] The DLL fil could not be found at path: " << directoryOfDLL + "\\" + dllFileName << endl;
+			getchar();
+			exit(-1);
+		}
+	}
 
 
 /// Get a hook to the GMS window
@@ -52,6 +78,12 @@ int main(int argc, char* argv[])
 	// Trigger compilation
 	if (valid) {
 		std::cout << (sendCompileSignal(IDE) == true ? "[OK] Success on sending signal." : "[!] Could not send signal.") << std::endl;
+	}
+	else
+	{
+		cerr << "[!] The IDE does not seem to be running." << endl;
+		getchar();
+		exit(-1);
 	}
 	// Run the generated executable
 	processInfo* procInfo_autoStart = nullptr;

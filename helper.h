@@ -65,16 +65,26 @@ void clear() {
     SetConsoleCursorPosition(console, topLeft);
 }
 
+
+
+//https://www.techiedelight.com/check-if-a-string-ends-with-another-string-in-cpp/
+bool endsWith(std::string const& str, std::string const& suffix) {
+    if (str.length() < suffix.length()) {
+        return false;
+    }
+    return str.compare(str.length() - suffix.length(), suffix.length(), suffix) == 0;
+}
+
 std::string getCurrentDir() // Returns EXE directory
 {
     char cCurrentPath[FILENAME_MAX]; // get working directory into buffer
-    if (!getcwd(cCurrentPath, sizeof(cCurrentPath)))
+    if (!_getcwd(cCurrentPath, sizeof(cCurrentPath)))
         exit(-1);
     cCurrentPath[sizeof(cCurrentPath) - 1] = '\0'; // not really required
 
     char* s = cCurrentPath; // save path from buffer into currentpath chararr
     std::string str(s);
-    free(s);
+    //free(s);
     return str;
 }
 
