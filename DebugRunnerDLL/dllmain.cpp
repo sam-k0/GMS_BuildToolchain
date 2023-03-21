@@ -83,7 +83,7 @@ void hide()
         }
 
         ShowWindowAsync(h, SW_HIDE);
-        ShowWindowAsync(c, SW_NORMAL);
+        //ShowWindowAsync(c, SW_NORMAL);
         this_thread::sleep_for(300ms);
     }
 }

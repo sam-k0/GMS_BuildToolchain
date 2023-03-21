@@ -29,6 +29,7 @@ int main(int argc, char* argv[])
 
 	bool CompileAgain = true;
 	bool RunAgain = true;
+	bool doNotHide = false;
 
 	std::vector<std::string> all_args; // Store the arguments as a vector of strings
 	string thisExePath = string(argv[0]); // get the current path to this file (including X.exe)
@@ -57,6 +58,11 @@ int main(int argc, char* argv[])
 					exit(-1);
 				}
 			}
+		}
+		else
+		if (std::find(all_args.begin(), all_args.end(), "-show") != all_args.end()) // contains -show flag
+		{
+			doNotHide = true;
 		}
 	}
 	else {
@@ -97,8 +103,8 @@ int main(int argc, char* argv[])
 		else
 		{
 			cerr << "[!] The IDE does not seem to be running." << endl;
-			getchar();
-			exit(-1);
+			//getchar();
+			//exit(-1);
 		}
 		// Run the generated executable
 		processInfo* procInfo_autoStart = nullptr;
