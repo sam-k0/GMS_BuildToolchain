@@ -70,16 +70,22 @@ void redirectStdoutNew()
 // Hides the main game window as soon as it pops up
 void hide()
 {
-    HWND h = find_main_window(GetCurrentProcessId());
-    HWND c = GetConsoleWindow();
-
-    while ((h = find_main_window(GetCurrentProcessId())) == c)
+    while (true) // Continuously Hide the thing
     {
-        cout << h << "/" << c << endl;
-        Sleep(200);
-    }
+        //cout << "Hiding.." << endl;
+        HWND h = find_main_window(GetCurrentProcessId());
+        HWND c = GetConsoleWindow();
 
-    ShowWindowAsync(h, SW_HIDE);
+        while ((h = find_main_window(GetCurrentProcessId())) == c)
+        {
+            //cout << h << "/" << c << endl;
+            this_thread::sleep_for(300ms);
+        }
+
+        ShowWindowAsync(h, SW_HIDE);
+        ShowWindowAsync(c, SW_NORMAL);
+        this_thread::sleep_for(300ms);
+    }
 }
 
 
