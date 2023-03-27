@@ -70,6 +70,14 @@ void redirectStdoutNew()
 // Hides the main game window as soon as it pops up
 void hide()
 {
+    std::string params = string(GetCommandLineA());
+    if (params.find("-show") != std::string::npos)// check the args
+    {
+        cout << "Not hiding the main window." << endl;
+        return;
+    }
+
+
     while (true) // Continuously Hide the thing
     {
         //cout << "Hiding.." << endl;
@@ -87,6 +95,7 @@ void hide()
         this_thread::sleep_for(300ms);
     }
 }
+
 
 
 extern "C" DLL_EXPORT BOOL APIENTRY DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)

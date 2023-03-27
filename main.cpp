@@ -142,7 +142,7 @@ int main(int argc, char* argv[])
 		
 		while (RunAgain)
 		{
-			StartProcessData manualProcessData = StartProcessWithDLL(directoryOfDLL, dllFileName, compiledProgramPath);
+			StartProcessData manualProcessData = StartProcessWithDLL(directoryOfDLL, dllFileName, compiledProgramPath, doNotHide);
 
 			std::cout << (manualProcessData.pid != NULL ? "[OK] Started executable with DLL attached." : "[!] Could not start and attach DLL.") << std::endl;
 

@@ -59,7 +59,7 @@ bool InjectDLL(const int& pid, const string& DLL_Path)
 }
 
 // MS Detours DLL loading
-StartProcessData StartProcessWithDLL(string directoryOfDll, string DllName, string appStartPath)
+StartProcessData StartProcessWithDLL(string directoryOfDll, string DllName, string appStartPath, bool doNotHide)
 {
     std::string _Dll = directoryOfDll + "\\" + DllName;
 
@@ -78,8 +78,14 @@ StartProcessData StartProcessWithDLL(string directoryOfDll, string DllName, stri
     PROCESS_INFORMATION _Information;
     ZeroMemory(&_Information, sizeof(PROCESS_INFORMATION));
 
+    string startupParams = "";
+    if (doNotHide)
+    {
+        startupParams = "-show";
+    }
+
     //THIS ONE FOR WIN 32 BIT
-    if (DetourCreateProcessWithDllA(appStartPath.c_str(), NULL, NULL, NULL, TRUE, CREATE_DEFAULT_ERROR_MODE, NULL, directoryOfDll.c_str(), &_StartupInfo, &_Information, _Dll.c_str(), NULL))
+    if (DetourCreateProcessWithDllA(appStartPath.c_str(), const_cast<char*>(startupParams.c_str()), NULL, NULL, TRUE, CREATE_DEFAULT_ERROR_MODE, NULL, directoryOfDll.c_str(), &_StartupInfo, &_Information, _Dll.c_str(), NULL))
     {
         //MessageBoxA(NULL, "INJECTED", NULL, NULL);
         cout << "[OK] Created Process with loaded DLL." << endl;
