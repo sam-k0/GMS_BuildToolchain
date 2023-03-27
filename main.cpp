@@ -63,11 +63,26 @@ int main(int argc, char* argv[])
 		if (std::find(all_args.begin(), all_args.end(), "-show") != all_args.end()) // contains -show flag
 		{
 			doNotHide = true;
+			// TODO: pack this into function
+			cout << "[?] Please input the game's executable file name (ex: my_game.exe)" << endl;
+			std::getline(std::cin, compiledProgramName);
+			cout << "[!] WARNING: This method of using the toolchain requires the DebugDLL to be in the same directory as this launcher." << endl;
+			directoryOfDLL = getCurrentDir();
+
+			cout << directoryOfDLL + "\\" + dllFileName << endl;
+
+			if (!fileExists(directoryOfDLL + "\\" + dllFileName))
+			{
+				cerr << "[!] The DLL fil could not be found at path: " << directoryOfDLL + "\\" + dllFileName << endl;
+				getchar();
+				exit(-1);
+			}
 		}
 	}
-	else {
+	else { // here aswell
 		cout << "[?] Please input the game's executable file name (ex: my_game.exe)" << endl;
-		cin >> compiledProgramName;
+		//cin >> compiledProgramName;
+		std::getline(std::cin, compiledProgramName);
 		cout << "[!] WARNING: This method of using the toolchain requires the DebugDLL to be in the same directory as this launcher." << endl;
 		directoryOfDLL = getCurrentDir();
 
@@ -114,7 +129,7 @@ int main(int argc, char* argv[])
 			Sleep(300);
 			clear();
 			procInfo_autoStart = getProgamProcInfo(compiledProgramName.c_str());
-			cout << "[...] Waiting for compilation to finish and game to start..." << endl;
+			cout << "[...] Waiting for compilation to finish and game ("<< compiledProgramName <<")to start..." << endl;
 		}
 		// Process is found
 		clear();
