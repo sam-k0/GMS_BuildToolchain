@@ -2,5 +2,5 @@
     "CompiledExecutableName":"CheatEngineDummy.exe",
     "DebugRunnerDLLName":"DLL_redirConsole.dll",
     "DebugRunnerDLLDirectory":"E:\\VisualStudio\\projects\\ProcRedirStdout\\Release",
-    "OtherArguments":"-show"
+    "OtherArguments":"-show -intel -vanillaGFX"
 }
