@@ -65,7 +65,41 @@ void clear() {
     SetConsoleCursorPosition(console, topLeft);
 }
 
+// Returns boolean wether a vector contains an exact string
+bool vector_contains_str(vector<string> s, string subs)
+{
+    if (std::find(s.begin(), s.end(), subs) != s.end()) {
+        return true;
+    }
+    return false;
+}
 
+// checks if a string s contains a substring subs
+bool string_contains_str(string s, string subs)
+{
+    if (s.find(subs) != std::string::npos) {
+        return true;
+    }
+    return false;
+}
+
+// checks if the vector contains a string containing a substring and returns the whole string if found
+string vector_find_substring(vector<string> strings, string subs)
+{
+    if (strings.size() == 0)
+    {
+        return "";
+    }
+
+    for (string s : strings)
+    {
+        if (string_contains_str(s, subs))
+        {
+            return s;
+        }
+    }
+    return "";
+}
 
 //https://www.techiedelight.com/check-if-a-string-ends-with-another-string-in-cpp/
 bool endsWith(std::string const& str, std::string const& suffix) {
@@ -90,6 +124,11 @@ std::string getCurrentDir() // Returns EXE directory
 
 string Join(vector<string> strings)
 {
+    if (strings.size() == 0)
+    {
+        return "";
+    }
+
     const char* const delim = " ";
     std::ostringstream imploded;
     string ret;

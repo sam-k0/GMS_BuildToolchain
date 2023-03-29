@@ -4,7 +4,45 @@
 #include "ConfigReader.h"
 
 processInfo* IDE = NULL;
+//string compiledProgramName = "";
+//string directoryOfDLL = "";
+//string dllFileName = "";
+YYRunnerConfig RunnerConfig;
 
+void setConfigManually(string otherArgs)
+{
+	cout << "[?] Please input the game's executable file name (ex: my_game.exe)" << endl;
+	std::getline(std::cin, RunnerConfig.CompiledExecutableName);
+	cout << "[!] WARNING: This method of using the toolchain requires the DebugDLL to be in the same directory as this launcher." << endl;
+	RunnerConfig.DebugRunnderDLLDirectory = getCurrentDir();
+	RunnerConfig.DebugRunnerDLLName = "DLL_redirConsole.dll";
+	cout << "[!] Expecting the DLL to be at: " << RunnerConfig.DebugRunnderDLLDirectory + "\\" + RunnerConfig.DebugRunnerDLLName << endl;
+
+	if (!fileExists(RunnerConfig.DebugRunnderDLLDirectory + "\\" + RunnerConfig.DebugRunnerDLLName))
+	{
+		cerr << "[!] The DLL fil could not be found at path: " << RunnerConfig.DebugRunnderDLLDirectory + "\\" + RunnerConfig.DebugRunnerDLLName << endl;
+		getchar();
+		exit(-1);
+	}
+
+	RunnerConfig.otherArguments = otherArgs;
+}
+
+void loadConfig(string configpath)
+{
+	
+	if (fileExists(configpath) && configpath != "")
+	{
+		cout << "[i] Reading file from: " << configpath << endl;
+		RunnerConfig = readConfigFromDebugFile(configpath);
+		if (!isValidConfig(RunnerConfig))
+		{
+			cerr << "[!] There's an error in the configuration file. Please regenerate the configuration file and restart the program" << endl;
+			getchar();
+			exit(-1);
+		}
+	}
+}
 
 void compile()
 {
@@ -22,15 +60,10 @@ void compile()
 
 int main(int argc, char* argv[])
 {
-	string compiledProgramName = "CheatEngineDummy.exe";
-	string directoryOfDLL = "E:\\VisualStudio\\projects\\DLL_redirConsole\\Release";
-	string dllFileName = "DLL_redirConsole.dll";
-	YYRunnerConfig RunnerConfig;
-
 	bool CompileAgain = true;
 	bool RunAgain = true;
-	bool doNotHide = false;
 
+	// args to vector
 	std::vector<std::string> all_args; // Store the arguments as a vector of strings
 	string thisExePath = string(argv[0]); // get the current path to this file (including X.exe)
 	if (argc > 1) {
@@ -42,58 +75,18 @@ int main(int argc, char* argv[])
 	}
 
 /// Read the configfile
-	// Check if it was passed as an argument (1)
+	// Check if it was passed as an argument
 	if (all_args.size() != 0)
 	{
-		if(endsWith(all_args.at(0), "runnerconfig"))
-		{ 
-			if (fileExists(all_args.at(0)))
-			{
-				cout << "[i] Reading file from: " << all_args.at(0) << endl;
-				RunnerConfig = readConfigFromDebugFile(all_args.at(0));
-				if (!isValidConfig(RunnerConfig))
-				{
-					cerr << "[!] There's an error in the configuration file. Please regenerate the configuration file and restart the program" << endl;
-					getchar();
-					exit(-1);
-				}
-			}
-		}
-		else
-		if (std::find(all_args.begin(), all_args.end(), "-show") != all_args.end()) // contains -show flag
-		{
-			doNotHide = true;
-			// TODO: pack this into function
-			cout << "[?] Please input the game's executable file name (ex: my_game.exe)" << endl;
-			std::getline(std::cin, compiledProgramName);
-			cout << "[!] WARNING: This method of using the toolchain requires the DebugDLL to be in the same directory as this launcher." << endl;
-			directoryOfDLL = getCurrentDir();
-
-			cout << directoryOfDLL + "\\" + dllFileName << endl;
-
-			if (!fileExists(directoryOfDLL + "\\" + dllFileName))
-			{
-				cerr << "[!] The DLL fil could not be found at path: " << directoryOfDLL + "\\" + dllFileName << endl;
-				getchar();
-				exit(-1);
-			}
-		}
+		string amogu = vector_find_substring(all_args, RUNNERCONFIG_FILE_NAME );
+		cout << amogu << endl;
+		loadConfig(amogu);
 	}
-	else { // here aswell
-		cout << "[?] Please input the game's executable file name (ex: my_game.exe)" << endl;
-		//cin >> compiledProgramName;
-		std::getline(std::cin, compiledProgramName);
-		cout << "[!] WARNING: This method of using the toolchain requires the DebugDLL to be in the same directory as this launcher." << endl;
-		directoryOfDLL = getCurrentDir();
-
-		cout << directoryOfDLL + "\\" + dllFileName << endl;
-
-		if (!fileExists(directoryOfDLL + "\\" + dllFileName))
-		{
-			cerr << "[!] The DLL fil could not be found at path: " << directoryOfDLL + "\\" + dllFileName << endl;
-			getchar();
-			exit(-1);
-		}
+	
+	if (!isValidConfig(RunnerConfig))
+	{
+		cout << "[!] Config in file 'runnerconfig' invalid! (Does it exist?)" << endl;
+		setConfigManually(Join(all_args));
 	}
 
 	
@@ -128,8 +121,8 @@ int main(int argc, char* argv[])
 
 			Sleep(300);
 			clear();
-			procInfo_autoStart = getProgamProcInfo(compiledProgramName.c_str());
-			cout << "[...] Waiting for compilation to finish and game ("<< compiledProgramName <<")to start..." << endl;
+			procInfo_autoStart = getProgamProcInfo(RunnerConfig.CompiledExecutableName.c_str());
+			cout << "[...] Waiting for compilation to finish and game ("<< RunnerConfig.CompiledExecutableName <<")to start..." << endl;
 		}
 		// Process is found
 		clear();
@@ -157,20 +150,22 @@ int main(int argc, char* argv[])
 		
 		while (RunAgain)
 		{
-			StartProcessData manualProcessData = StartProcessWithDLL(directoryOfDLL, dllFileName, compiledProgramPath, doNotHide);
+			StartProcessData manualProcessData = StartProcessWithDLL(RunnerConfig.DebugRunnderDLLDirectory, RunnerConfig.DebugRunnerDLLName, compiledProgramPath, RunnerConfig.otherArguments);
 
 			std::cout << (manualProcessData.pid != NULL ? "[OK] Started executable with DLL attached." : "[!] Could not start and attach DLL.") << std::endl;
 
 			if (manualProcessData.hProc == NULL)
 			{
 				// failed to launch...
-				continue;
+				cout << "Failed to launch executable. Check the DLL's presence in the folder: " << RunnerConfig.DebugRunnderDLLDirectory << endl;
+				getchar();
+				exit(-1);
 			}
 
 			cout << "[i] Waiting for the game to finish." << endl;
 			WaitForSingleObject(manualProcessData.hProc, INFINITE);
 			/// Ask to run again?
-			clear(); // clear console
+			cout << "--------" << endl;
 			cout << "[?] >> Enter a command: [r]un again, [c]ompile again, [q]uit" << endl;
 			char c;
 			cin >> c;
