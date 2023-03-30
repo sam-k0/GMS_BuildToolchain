@@ -9,9 +9,38 @@
 #include <wincon.h>
 #include <thread>
 #include "bruh.h"
-
+#include "Hooking.h"
+#include <atlstr.h>
 using namespace std;
 
+setDlgItemTextW pSetDlgItemTextW = nullptr;
+setDlgItemTextW pSetDlgItemTextWTarget; // Orig function before hook
+
+peekMessageA pPeekMessageA = nullptr;
+peekMessageA pPeekMessageATarget;
+
+BOOL WINAPI hookedPeekMessageA(LPMSG lpMsg, HWND hWnd, UINT wmsgfiltermin, UINT wmsgfiltermax, UINT mremovemsg)
+{
+    if (lpMsg->message == WM_KEYDOWN)
+    {
+        std::cout << "Key pressed!" << std::endl;
+        //MessageBoxA(NULL, "sus", "sus", 1);
+    }
+    return pPeekMessageA(lpMsg, hWnd, wmsgfiltermin, wmsgfiltermax, mremovemsg);
+}
+
+BOOL WINAPI hookedSetDlgItemTextW( HWND hDlg,int nIDDlgItem, LPCWSTR lpString)
+{
+    if (nIDDlgItem == 1001)
+    {
+        std::cout << CW2A(lpString) << std::endl;
+
+        std::cout << "The game crashed fatally. Press any key to exit." << std::endl;
+        getchar();
+        exit(-1);
+    }
+    return pSetDlgItemTextW(hDlg, nIDDlgItem, lpString);
+}
 
 std::thread t; // the thread to hide the main window.
 
@@ -96,7 +125,32 @@ void hide()
     }
 }
 
+void installHooks()
+{
+    cout << "[MH] Installing hooks" << endl;
+    if (MH_Initialize() != ::MH_OK)
+    {
+        cout << "[MH] Could not initialize MinHook" << endl;
+        return;
+    }
 
+    if (MH_CreateHookApiEx(L"user32", "PeekMessageA", &hookedPeekMessageA, reinterpret_cast<void**>(&pPeekMessageA), reinterpret_cast<void**>(&pPeekMessageATarget)) != MH_OK)
+    {
+        cout << "[MH] Could not hook PeekMessageA" << endl;
+        return;
+    }
+
+    if (MH_CreateHookApi(L"user32", "SetDlgItemTextW", &hookedSetDlgItemTextW, reinterpret_cast<void**>(&pSetDlgItemTextW)) != MH_OK)
+    {
+        cout << "[MH] Could not hook SetDlgItemTextW" << endl;
+        return;
+    }
+
+    if (MH_EnableHook(MH_ALL_HOOKS) != MH_OK)
+    {
+        cout << "[MH] Could not enable all hooks" << endl;
+    }
+}
 
 extern "C" DLL_EXPORT BOOL APIENTRY DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
@@ -106,6 +160,7 @@ extern "C" DLL_EXPORT BOOL APIENTRY DllMain(HINSTANCE hinstDLL, DWORD fdwReason,
         redirectStdoutNew();
         t = thread(hide);
         std::cout << "[GMS Build Toolchain] Hello from the hooked runner!" << std::endl;
+        installHooks();
         break;
 
     case DLL_PROCESS_DETACH:
