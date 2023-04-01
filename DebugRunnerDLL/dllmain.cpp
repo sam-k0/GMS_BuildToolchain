@@ -11,6 +11,7 @@
 #include "bruh.h"
 #include "Hooking.h"
 #include <atlstr.h>
+#include <stdarg.h>
 using namespace std;
 
 setDlgItemTextW pSetDlgItemTextW = nullptr;
@@ -18,6 +19,7 @@ setDlgItemTextW pSetDlgItemTextWTarget; // Orig function before hook
 
 peekMessageA pPeekMessageA = nullptr;
 peekMessageA pPeekMessageATarget;
+
 
 BOOL WINAPI hookedPeekMessageA(LPMSG lpMsg, HWND hWnd, UINT wmsgfiltermin, UINT wmsgfiltermax, UINT mremovemsg)
 {
@@ -31,6 +33,7 @@ BOOL WINAPI hookedPeekMessageA(LPMSG lpMsg, HWND hWnd, UINT wmsgfiltermin, UINT 
 
 BOOL WINAPI hookedSetDlgItemTextW( HWND hDlg,int nIDDlgItem, LPCWSTR lpString)
 {
+    cout << "niddlgItem: " << nIDDlgItem << endl;
     if (nIDDlgItem == 1001)
     {
         std::cout << CW2A(lpString) << std::endl;
@@ -41,6 +44,7 @@ BOOL WINAPI hookedSetDlgItemTextW( HWND hDlg,int nIDDlgItem, LPCWSTR lpString)
     }
     return pSetDlgItemTextW(hDlg, nIDDlgItem, lpString);
 }
+
 
 std::thread t; // the thread to hide the main window.
 
@@ -145,6 +149,8 @@ void installHooks()
         cout << "[MH] Could not hook SetDlgItemTextW" << endl;
         return;
     }
+
+
 
     if (MH_EnableHook(MH_ALL_HOOKS) != MH_OK)
     {
